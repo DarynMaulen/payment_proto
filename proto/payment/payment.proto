@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package payment.v1;
+
+option go_package = "github.com/DarynMaulen/payment_proto/gen/go/payment";
+
+import "google/protobuf/timestamp.proto";
+
+service PaymentService {
+  rpc Transfer           (TransferRequest)            returns (TransferResponse);
+  rpc GetPayment         (GetPaymentRequest)           returns (GetPaymentResponse);
+  rpc GetPaymentHistory  (GetPaymentHistoryRequest)    returns (GetPaymentHistoryResponse);
+  rpc CancelPayment      (CancelPaymentRequest)        returns (CancelPaymentResponse);
+}
+
+message TransferRequest {
+  string sender_id    = 1;
+  string receiver_id  = 2;
+  int64  amount       = 3;
+  string currency     = 4;
+  string description  = 5;
+}
+
+message TransferResponse {
+  PaymentProto payment = 1;
+}
+
+message GetPaymentRequest {
+  string payment_id = 1;
+}
+
+message GetPaymentResponse {
+  PaymentProto payment = 1;
+}
+
+message GetPaymentHistoryRequest {
+  string account_id = 1;
+  int32  limit      = 2;
+  int32  offset     = 3;
+}
+
+message GetPaymentHistoryResponse {
+  repeated PaymentProto payments = 1;
+}
+
+message CancelPaymentRequest {
+  string payment_id    = 1;
+  string requested_by  = 2;
+}
+
+message CancelPaymentResponse {
+  bool   success = 1;
+  string message = 2;
+}
+
+message PaymentProto {
+  string                    payment_id   = 1;
+  string                    sender_id    = 2;
+  string                    receiver_id  = 3;
+  int64                     amount       = 4;
+  string                    currency     = 5;
+  string                    status       = 6;
+  string                    type         = 7;
+  string                    description  = 8;
+  google.protobuf.Timestamp created_at   = 9;
+  google.protobuf.Timestamp updated_at   = 10;
+}
