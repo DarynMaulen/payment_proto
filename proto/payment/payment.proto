@@ -7,10 +7,12 @@ option go_package = "github.com/DarynMaulen/payment_proto/gen/go/payment";
 import "google/protobuf/timestamp.proto";
 
 service PaymentService {
-  rpc Transfer           (TransferRequest)            returns (TransferResponse);
-  rpc GetPayment         (GetPaymentRequest)           returns (GetPaymentResponse);
-  rpc GetPaymentHistory  (GetPaymentHistoryRequest)    returns (GetPaymentHistoryResponse);
-  rpc CancelPayment      (CancelPaymentRequest)        returns (CancelPaymentResponse);
+  rpc Transfer    (TransferRequest)    returns (TransferResponse);
+  rpc Deposit     (DepositRequest)     returns (DepositResponse);
+  rpc Withdrawal  (WithdrawalRequest)  returns (WithdrawalResponse);
+  rpc GetPayment        (GetPaymentRequest)        returns (GetPaymentResponse);
+  rpc GetPaymentHistory (GetPaymentHistoryRequest) returns (GetPaymentHistoryResponse);
+  rpc CancelPayment     (CancelPaymentRequest)     returns (CancelPaymentResponse);
 }
 
 message TransferRequest {
@@ -51,6 +53,28 @@ message CancelPaymentRequest {
 message CancelPaymentResponse {
   bool   success = 1;
   string message = 2;
+}
+
+message DepositRequest {
+  string receiver_id  = 1;
+  int64  amount       = 2;
+  string currency     = 3;
+  string description  = 4;
+}
+
+message DepositResponse {
+  PaymentProto payment = 1;
+}
+
+message WithdrawalRequest {
+  string sender_id    = 1;
+  int64  amount       = 2;
+  string currency     = 3;
+  string description  = 4;
+}
+
+message WithdrawalResponse {
+  PaymentProto payment = 1;
 }
 
 message PaymentProto {
