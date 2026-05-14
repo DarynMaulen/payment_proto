@@ -6,10 +6,10 @@ on:
       - main
     paths:
       - 'proto/**'
-  pull_request:
-    paths:
-      - 'proto/**'
   workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   generate:
@@ -29,6 +29,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.23'
+          cache: false
 
       - name: Install protoc
         uses: arduino/setup-protoc@v3
@@ -59,13 +60,16 @@ jobs:
       - name: Check for changes
         id: git_diff
         run: |
-          git diff --exit-code gen/ || echo "changed=true" >> $GITHUB_OUTPUT
+          git add gen/
+          # Проверяем, есть ли что-то новое в индексе
+          if [ -n "$(git status --porcelain gen/)" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
 
       - name: Commit generated files
-        if: steps.git_diff.outputs.changed == 'true' && github.event_name == 'push'
+        if: steps.git_diff.outputs.changed == 'true'
         run: |
           git config --global user.name  "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add gen/
           git commit -m "chore: regenerate proto [skip ci]"
           git push
